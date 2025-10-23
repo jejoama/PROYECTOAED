@@ -33,6 +33,13 @@ df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_
 ```
 
 ```{r}
+# Cambiar el nombre de la columna "Relación con la actividad económica" a uno más corto
+colnames(df)[3]<-"Situacion_Laboral"
+colnames(df)
+```
+
+
+```{r}
 # Comprobar los valores NA
 sapply(df, function(x) sum(is.na(x)))
 # Ver la posición 
@@ -54,9 +61,19 @@ df<-df[-which(is.na(df$Total)),]
 sapply(df, function(x) sum(is.na(x)))
 ```
 
+```{r}
+# Transformar los datos a su formato real
+df$Total<-as.double(df$Total)
+df$Sexo<-as.factor(df$Sexo) # "Ambos sexos" "Hombres"     "Mujeres" 
+df$Edad<-as.factor(df$Edad)
+df$Situacion_Laboral<-as.factor(df$Situacion_Laboral)
+str(df)
+```
 
 
-
+```{r}
+levels(df$Situacion_Laboral)
+```
 
 
 
