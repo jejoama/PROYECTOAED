@@ -32,6 +32,32 @@ library(readr)
 df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
 
+```{r}
+# Comprobar los valores NA
+sapply(df, function(x) sum(is.na(x)))
+# Ver la posición 
+which(is.na(df$Total))
+```
+
+```{r}
+# Eliminar valores NA: son 111 filas en comparación a las 4446 que son en total
+df_na<-df[which(is.na(df$Total)),]
+```
+
+```{r}
+# Guardo el dataframe sin los valores NA
+df<-df[-which(is.na(df$Total)),]
+```
+
+```{r}
+# Comprobar que no hay valores NA:
+sapply(df, function(x) sum(is.na(x)))
+```
+
+
+
+
+
 
 
 
