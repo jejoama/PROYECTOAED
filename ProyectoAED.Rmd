@@ -9,6 +9,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+# Librerías
+
+```{r}
+# Aquí habría que hacer algún scrip para descargar las librerías si no las tienen
+library(readr)
+library(dplyr)
+```
+
+
+
 # Limpieza de los datos
 
 ```{r}
@@ -24,18 +35,16 @@ guess_encoding(archivo)
 
 Cosas que hay que tener en cuenta:
 
-1. En el dataframe los valores NA están identificados como ".." y solo están en la columna Total
-2. La marca del decimal está con ","
+1. En el dataframe los valores NA están identificados como ".." y solo están en la columna Total.
+2. La marca del decimal está con ",".
 
 ```{r}
-library(readr)
 df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
 
 ```{r}
 # Cambiar el nombre de la columna "Relación con la actividad económica" a uno más corto
 colnames(df)[3]<-"Situacion_Laboral"
-colnames(df)
 ```
 
 
@@ -43,7 +52,7 @@ colnames(df)
 # Comprobar los valores NA
 sapply(df, function(x) sum(is.na(x)))
 # Ver la posición 
-which(is.na(df$Total))
+# which(is.na(df$Total))
 ```
 
 ```{r}
@@ -62,9 +71,9 @@ sapply(df, function(x) sum(is.na(x)))
 ```
 
 ```{r}
-# Transformar los datos a su formato real
+# Transformar los datos a su formato idóneo
 df$Total<-as.double(df$Total)
-df$Sexo<-as.factor(df$Sexo) # "Ambos sexos" "Hombres"     "Mujeres" 
+df$Sexo<-as.factor(df$Sexo) 
 df$Edad<-as.factor(df$Edad)
 df$Situacion_Laboral<-as.factor(df$Situacion_Laboral)
 str(df)
@@ -72,7 +81,10 @@ str(df)
 
 
 ```{r}
-levels(df$Situacion_Laboral)
+# Guardar los niveles
+levels_sexo<-levels(df$Sexo)
+levels_edad<-levels(df$Edad) # habría que ordenarlo
+levels_situacion<-levels(df$Situacion_Laboral) #Ordenamos? 
 ```
 
 
