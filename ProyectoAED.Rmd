@@ -73,15 +73,9 @@ df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_
 str(df)
 ```
 
-
-```{r}
-# Comprobar los valores NA
-sapply(df, function(x) sum(is.na(x)))
-```
-
 ```{r}
 # Limpiar el dataframe usando tidyverse
-df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% na.omit() %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
+df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
 
 ```{r}
@@ -90,23 +84,24 @@ df_na<-df[which(is.na(df$Total)),]
 ```
 
 ```{r}
-levels_sexo<-levels(df_limpio$Sexo)
-levels_edad<-levels(df_limpio$Edad) # habría que ordenarlo
-```
-
-```{r}
 df_tidy <- df_limpio %>%
   # Creamos nuevas columnas a partir de los valores de 'Situacion_Laboral'
   pivot_wider(
     names_from = Situacion_Laboral, # Los nombres de las nuevas columnas vienen de aquí
     values_from = Total            # Los valores de las nuevas columnas vienen de aquí
-  )
+  ) %>% mutate(across(.cols=all_of(c("Parados","Parados que buscan primer empleo")),.fns=~replace_na(.,0))) %>% rename(Parados_sin_exp = `Parados que buscan primer empleo`)
 ```
 
+
+```{r}
+levels_sexo<-levels(df_limpio$Sexo)
+levels_edad<-levels(df_limpio$Edad)
+```
 
 
 ```{r}
 sapply(df_tidy,function(x) sum(is.na(x)))
 ```
+
 
 
