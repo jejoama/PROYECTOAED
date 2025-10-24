@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
 ```
 
-# Librerías
+# Carga de Librerías
 
 ```{r}
 # Aquí habría que hacer algún scrip para descargar las librerías si no las tienen
@@ -25,9 +25,16 @@ library(tidyr)
 
 
 
+# Significado de los datos
+
+$$\text{Activos}=\text{Ocupados}+\text{Parados}$$
+
+$$\text{Total}=\text{Activos}+\text{Inactivos}$$
+
+
 # Limpieza de los datos
 
-Pasos para la limpieza de datos:
+**Pasos para la limpieza de datos:**
 
 1. Ver la codificación del archivo para compilarlo con la codificación correcta.
 
@@ -46,6 +53,8 @@ Pasos para la limpieza de datos:
 8. Pasar el dataset como tidy:
   En el dataframe descargado se tiene una columna total que contiene multiples variables a la vez. Se puede convertir a tidy usando `tidyr::pivot_wider()` 
 
+9. Añadir columnas de Tasa de Paro, Tasa de Actividad y Tasa de Ocupación
+
 
 ```{r}
 # Ver el tipo de codificación del archivo
@@ -54,14 +63,12 @@ guess_encoding(archivo)
 ```
 
 
-Cosas que hay que tener en cuenta:
-
-1. En el dataframe los valores NA están identificados como ".." y solo están en la columna Total.
-2. La marca del decimal está con ",".
 
 ```{r}
 df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
+
+
 ```{r}
 str(df)
 ```
@@ -73,26 +80,33 @@ sapply(df, function(x) sum(is.na(x)))
 ```
 
 ```{r}
-# Guardar los valores NA por si los necesitamos
-df_na<-df[which(is.na(df$Total)),]
-```
-
-
-```{r}
 # Limpiar el dataframe usando tidyverse
 df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% na.omit() %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
 
-
+```{r}
+# Guardar los valores NA por si los necesitamos
+df_na<-df[which(is.na(df$Total)),]
+```
 
 ```{r}
 levels_sexo<-levels(df_limpio$Sexo)
-levels_sexo
 levels_edad<-levels(df_limpio$Edad) # habría que ordenarlo
-levels_edad
-levels_situacion<-levels(df_limpio$Situacion_Laboral) #Ordenamos? 
-levels_situacion
 ```
 
+```{r}
+df_tidy <- df_limpio %>%
+  # Creamos nuevas columnas a partir de los valores de 'Situacion_Laboral'
+  pivot_wider(
+    names_from = Situacion_Laboral, # Los nombres de las nuevas columnas vienen de aquí
+    values_from = Total            # Los valores de las nuevas columnas vienen de aquí
+  )
+```
+
+
+
+```{r}
+sapply(df_tidy,function(x) sum(is.na(x)))
+```
 
 
