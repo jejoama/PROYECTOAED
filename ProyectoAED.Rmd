@@ -25,9 +25,15 @@ library(tidyr)
 
 
 
-# Significado de los datos
+# Significado de los datos del Mercado Laboral
+
+Este conjunto de datos ha sido transformado al formato tidy para que las filas correspondan a una única observación junto a las medidas de la Encuesta de Población Activa se encuentren en columnas separadas.
+
+Los datos activos se relacionan de la siguiente manera:
 
 $$\text{Activos}=\text{Ocupados}+\text{Parados}$$
+Y el valor Total de la siguiente forma:
+
 
 $$\text{Total}=\text{Activos}+\text{Inactivos}$$
 
@@ -38,22 +44,24 @@ $$\text{Total}=\text{Activos}+\text{Inactivos}$$
 
 1. Ver la codificación del archivo para compilarlo con la codificación correcta.
 
-2. Importar los datos teniendo en cuenta que los valores NA son ".." y poner el signo decimal como ","
+2. Importar los datos teniendo en cuenta que los valores NA son ".." y poner el signo decimal como ",".
 
-3. Redefinir "Relación con la actividad económica" por una más corta
+3. Ver qué formato tienen las variables.
+
+4. Limpiar el dataframe usando tidyverse:
+- Redefinir "Relación con la actividad económica" por una más corta ("Situacion_Laboral")
+- Cambiar el formato de las variables
 
 4. Ver en qué columna y la cantidad de valores NA con `sapply(df, function(x) sum(is.na(x)))`
 
 5. Se guarda en un dataframe `df_na` las instancias con na 
 
-6. Se eliminan del dataframe original los datos faltantes
+6. Transformar el dataframe a un dataframe tidy utilizando los valores de "Situacion_Laboral"
 
-7. Se transforman los datos al tipo idóneo para trabajar con ellos
+7. Poner a 0 los valores NA
+Los valores faltantes son aquellos valores correspondientes al grupo de edades altos de paro o en busca de trabajo. Estos valores rondan el valor 0 (los que están en el dataframe) entonces se opta poner a 0 todos esos valores para no perder las instancias.
 
-8. Pasar el dataset como tidy:
-  En el dataframe descargado se tiene una columna total que contiene multiples variables a la vez. Se puede convertir a tidy usando `tidyr::pivot_wider()` 
-
-9. Añadir columnas de Tasa de Paro, Tasa de Actividad y Tasa de Ocupación
+8. Añadir columnas de Tasa de Paro, Tasa de Actividad y Tasa de Ocupación
 
 
 ```{r}
