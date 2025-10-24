@@ -10,21 +10,42 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+```{r}
+rm(list=ls())
+```
+
 # Librerías
 
 ```{r}
 # Aquí habría que hacer algún scrip para descargar las librerías si no las tienen
 library(readr)
 library(dplyr)
+library(tidyr)
 ```
 
 
 
 # Limpieza de los datos
 
-```{r}
-rm(list=ls())
-```
+Pasos para la limpieza de datos:
+
+1. Ver la codificación del archivo para compilarlo con la codificación correcta.
+
+2. Importar los datos teniendo en cuenta que los valores NA son ".." y poner el signo decimal como ","
+
+3. Redefinir "Relación con la actividad económica" por una más corta
+
+4. Ver en qué columna y la cantidad de valores NA con `sapply(df, function(x) sum(is.na(x)))`
+
+5. Se guarda en un dataframe `df_na` las instancias con na 
+
+6. Se eliminan del dataframe original los datos faltantes
+
+7. Se transforman los datos al tipo idóneo para trabajar con ellos
+
+8. Pasar el dataset como tidy:
+  En el dataframe descargado se tiene una columna total que contiene multiples variables a la vez. Se puede convertir a tidy usando `tidyr::pivot_wider()` 
+
 
 ```{r}
 # Ver el tipo de codificación del archivo
@@ -41,52 +62,37 @@ Cosas que hay que tener en cuenta:
 ```{r}
 df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
-
 ```{r}
-# Cambiar el nombre de la columna "Relación con la actividad económica" a uno más corto
-colnames(df)[3]<-"Situacion_Laboral"
+str(df)
 ```
 
 
 ```{r}
 # Comprobar los valores NA
 sapply(df, function(x) sum(is.na(x)))
-# Ver la posición 
-# which(is.na(df$Total))
 ```
 
 ```{r}
-# Eliminar valores NA: son 111 filas en comparación a las 4446 que son en total
+# Guardar los valores NA por si los necesitamos
 df_na<-df[which(is.na(df$Total)),]
 ```
 
-```{r}
-# Guardo el dataframe sin los valores NA
-df<-df[-which(is.na(df$Total)),]
-```
 
 ```{r}
-# Comprobar que no hay valores NA:
-sapply(df, function(x) sum(is.na(x)))
-```
-
-```{r}
-# Transformar los datos a su formato idóneo
-df$Total<-as.double(df$Total)
-df$Sexo<-as.factor(df$Sexo) 
-df$Edad<-as.factor(df$Edad)
-df$Situacion_Laboral<-as.factor(df$Situacion_Laboral)
-str(df)
+# Limpiar el dataframe usando tidyverse
+df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% na.omit() %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
 
 
-```{r}
-# Guardar los niveles
-levels_sexo<-levels(df$Sexo)
-levels_edad<-levels(df$Edad) # habría que ordenarlo
-levels_situacion<-levels(df$Situacion_Laboral) #Ordenamos? 
-```
 
+```{r}
+levels_sexo<-levels(df_limpio$Sexo)
+levels_sexo
+levels_edad<-levels(df_limpio$Edad) # habría que ordenarlo
+levels_edad
+levels_situacion<-levels(df_limpio$Situacion_Laboral) #Ordenamos? 
+levels_situacion
+```
 
 
 
