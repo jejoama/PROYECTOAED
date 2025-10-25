@@ -111,5 +111,10 @@ levels_edad<-levels(df_limpio$Edad)
 sapply(df_tidy,function(x) sum(is.na(x)))
 ```
 
+```{r}
+df_tidy$Tasa_paro<-df_tidy$Parados/df_tidy$Activos*100
+df_tidy$Tasa_actividad<-df_tidy$Activos/df_tidy$Total*100
+df_tidy$Tasa_ocupacion<-df_tidy$Ocupados/df_tidy$Total*100
+```
 
 
