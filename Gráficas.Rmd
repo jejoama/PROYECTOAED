@@ -11,52 +11,160 @@ knitr::opts_chunk$set(echo = TRUE)
 # Documento para la elaboración de gráficas
 
 
-Evolución del numero de ocupados, parados e inactivos desde 2006
+##### LIMPIEZA AGAIN = copypaste de Javi
 
-
-# Carga de librerias
 ```{r}
-library(dplyr)
-library(ggplot2)
+# Ver el tipo de codificación del archivo
+archivo<-"data/65948.csv"
+guess_encoding(archivo)
 ```
-
-
+# Limpieza basica
 ```{r}
-# Como hay mas de 4000 filas, no podemos verificar visulamente que todas sean "numericas", entonces lo convertimos
-datos <- datos %>% mutate(total = as.numeric(gsub(",", ".", total)))
-```
-
-
-Encontramos un problema, que hay valores que no se pueden transformar. Hay que averiguar cuantos y en cuantas columnas. 
-```{r}
-datos %>%
-  filter(is.na(as.numeric(gsub(",", ".", total)))) %>%
-  select(total) %>%
-  distinct()
-
-```
-
-```{r}
-datos %>%
-  filter(is.na(as.numeric(gsub(",", ".", total)))) %>%
-  distinct(total)
-
-```
-
-Hay que saber cuantos NA hay
-```{r}
-sapply(datos, function(x) sum(is.na(x)))
-```
-
-JAVI EXPLICA ESTO BIEN TU jñkndacohwbou que no lo se explicar bien
-Dado que el desempleo de mayores de 70 años es 0, pues consideramos que es mejor considerar dichos datos como 0 
-```{r}
-datos <- datos %>% mutate(total = if_else(is.na(total) & edad == "70 y más años" & sexo %in% c("Hombres", "Mujeres"),0,total))
+#Limpieza de nombres de columnas
+library(readr)
+datos <- read_delim("data/65948.csv", delim = "\t")
+library(janitor)
+datos <- datos %>% clean_names()
 datos
 ```
+
+
+
+
+# Limpieza avanzada y transformación de los datos
+
 ```{r}
-datos %>%
-  filter(sexo == "Ambos sexos" & is.na(total))
+df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
+```
+
+
+```{r}
+str(df)
+```
+
+```{r}
+# Limpiar el dataframe usando tidyverse
+df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
+```
+
+```{r}
+# Guardar los valores NA por si los necesitamos
+df_na<-df[which(is.na(df$Total)),]
+```
+
+```{r}
+df_tidy <- df_limpio %>%
+  # Creamos nuevas columnas a partir de los valores de 'Situacion_Laboral'
+  pivot_wider(
+    names_from = Situacion_Laboral, # Los nombres de las nuevas columnas vienen de aquí
+    values_from = Total            # Los valores de las nuevas columnas vienen de aquí
+  ) %>% mutate(across(.cols=all_of(c("Parados","Parados que buscan primer empleo")),.fns=~replace_na(.,0))) %>% rename(Parados_sin_exp = `Parados que buscan primer empleo`)
+```
+
+
+```{r}
+levels_sexo<-levels(df_limpio$Sexo)
+levels_edad<-levels(df_limpio$Edad)
+```
+
+
+```{r}
+sapply(df_tidy,function(x) sum(is.na(x)))
+```
+```{r}
+# Hay algun NA?
+datos %>% filter(if_any(everything(), is.na))
+```
+
+
+```{r}
+summary(datos)
+```
+
+
+```{r}
+df_tidy$Tasa_paro<-df_tidy$Parados/df_tidy$Activos*100
+df_tidy$Tasa_actividad<-df_tidy$Activos/df_tidy$Total*100
+df_tidy$Tasa_ocupacion<-df_tidy$Ocupados/df_tidy$Total*100
+```
+
+
+
+
+
+
+
+
+
+
+# Graficas = Joe
+
+Agrupacaión de los datos según su año y su situación laboral
+```{r}
+df_agrupado <- df_limpio %>% group_by(Periodo, Situacion_Laboral) %>% summarise(total = sum(Total, na.rm = TRUE)) %>% ungroup()
+df_agrupado
+```
+
+Gráfica
+
+```{r}
+library(ggplot2)
+ggplot(df_agrupado, aes(x= Periodo, y=total, colour= Situacion_Laboral)) + geom_line(size=1.35) + scale_x_continuous(breaks = seq(2006, 2024, by = 2)) + scale_y_continuous(labels = scales::comma) + labs(title= "Evolución  de ocupados, parados e inactivos (2006–2024)", x= "Año", y="Personas", colour="Situación laboral" ) + theme_minimal()
+```
+```{r}
+cat("En la gráfica se observan diversas fluctuaños en los años 2008 (debido a la crisis financiera) y 2020 (provocada por el Covid-19) tales como el aumento de Parados y disminución de los ocupados\n")
+```
+
+Ahora bien, vista la gráfica y un poco sus tendencia, seria interesante verlo desde una perspectiva de sexo y edad.
+```{r}
+# Agrupamos por año, sexo y edad
+df_por_sexo_edad <- df_tidy %>%
+  group_by(Periodo, Sexo, Edad) %>%
+  summarise(
+    tasa_paro = mean(Tasa_paro, na.rm = TRUE),
+    tasa_actividad = mean(Tasa_actividad, na.rm = TRUE),
+    tasa_ocupacion = mean(Tasa_ocupacion, na.rm = TRUE)
+  ) %>% ungroup()
+```
+
+
+Gráfica según sexo
+```{r}
+library(ggplot2)
+
+ggplot(df_por_sexo_edad, aes(x = Periodo, y = tasa_actividad, color = Edad)) +
+  geom_line(size = 1) +
+  facet_wrap(~Sexo) +  # Separa el gráfico por paneles según sexo
+  scale_x_continuous(breaks = seq(2006, 2024, by = 2)) +  
+  scale_y_continuous(labels = scales::comma) +  
+  labs(
+    title = "Tasa de actividad por edad y sexo (2006–2024)",
+    x = "Año",
+    y = "Tasa de actividad (%)",
+    color = "Edad"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Inclina los años
+    legend.position = "bottom"  # Mueve la leyenda abajo
+  )
+
 
 ```
+
+```{r}
+df_por_sexo <- df_tidy %>%
+  group_by(Periodo, Sexo) %>%
+  summarise(Activos = sum(Activos, na.rm = TRUE), .groups = "drop")
+
+ggplot(df_por_sexo, aes(x = Periodo, y = Activos, fill = Sexo)) +
+  geom_area(alpha = 0.6) +
+  labs(title = "Evolución acumulada de activos por sexo",
+       x = "Año", y = "Personas", fill = "Sexo") +
+  theme_minimal()
+```
+
+
+
+
 
