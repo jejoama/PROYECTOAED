@@ -1,0 +1,62 @@
+---
+title: "GraficasProyecto"
+output: html_document
+date: "2025-10-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Documento para la elaboración de gráficas
+
+
+Evolución del numero de ocupados, parados e inactivos desde 2006
+
+
+# Carga de librerias
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+
+```{r}
+# Como hay mas de 4000 filas, no podemos verificar visulamente que todas sean "numericas", entonces lo convertimos
+datos <- datos %>% mutate(total = as.numeric(gsub(",", ".", total)))
+```
+
+
+Encontramos un problema, que hay valores que no se pueden transformar. Hay que averiguar cuantos y en cuantas columnas. 
+```{r}
+datos %>%
+  filter(is.na(as.numeric(gsub(",", ".", total)))) %>%
+  select(total) %>%
+  distinct()
+
+```
+
+```{r}
+datos %>%
+  filter(is.na(as.numeric(gsub(",", ".", total)))) %>%
+  distinct(total)
+
+```
+
+Hay que saber cuantos NA hay
+```{r}
+sapply(datos, function(x) sum(is.na(x)))
+```
+
+JAVI EXPLICA ESTO BIEN TU jñkndacohwbou que no lo se explicar bien
+Dado que el desempleo de mayores de 70 años es 0, pues consideramos que es mejor considerar dichos datos como 0 
+```{r}
+datos <- datos %>% mutate(total = if_else(is.na(total) & edad == "70 y más años" & sexo %in% c("Hombres", "Mujeres"),0,total))
+datos
+```
+```{r}
+datos %>%
+  filter(sexo == "Ambos sexos" & is.na(total))
+
+```
+
