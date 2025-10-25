@@ -70,25 +70,12 @@ Los valores faltantes son aquellos valores correspondientes al grupo de edades a
 archivo<-"data/65948.csv"
 guess_encoding(archivo)
 ```
-# Limpieza basica
-```{r}
-#Limpieza de nombres de columnas
-library(readr)
-datos <- read_delim("data/65948.csv", delim = "\t")
-library(janitor)
-datos <- datos %>% clean_names()
-datos
-```
-
-
-
 
 # Limpieza avanzada y transformación de los datos
 
 ```{r}
-df <-  read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
+df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
-
 
 ```{r}
 str(df)
@@ -117,26 +104,28 @@ df_tidy <- df_limpio %>%
 ```{r}
 levels_sexo<-levels(df_limpio$Sexo)
 levels_edad<-levels(df_limpio$Edad)
+# La Edad es una variable ordinal, dado que sus variables tienen un orden intrínseco es necesario ordenar 
 ```
+
+
+
 
 
 ```{r}
 sapply(df_tidy,function(x) sum(is.na(x)))
 ```
-```{r}
-# Hay algun NA?
-datos %>% filter(if_any(everything(), is.na))
-```
-
-
-```{r}
-summary(datos)
-```
-
 
 ```{r}
 df_tidy$Tasa_paro<-df_tidy$Parados/df_tidy$Activos*100
 df_tidy$Tasa_actividad<-df_tidy$Activos/df_tidy$Total*100
 df_tidy$Tasa_ocupacion<-df_tidy$Ocupados/df_tidy$Total*100
 ```
+
+```{r}
+summary(df_tidy)
+```
+```{r}
+str(df_tidy)
+```
+
 
