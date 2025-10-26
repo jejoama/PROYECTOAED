@@ -27,46 +27,42 @@ library(forcats)
 
 
 
-# Significado de los datos del Mercado Laboral
+# Significado de los Datos del Mercado Laboral (EPA)
 
-Este conjunto de datos ha sido transformado al formato tidy para que las filas correspondan a una única observación junto a las medidas de la Encuesta de Población Activa se encuentren en columnas separadas.
+## Relaciones Fundamentales
 
-Los datos activos se relacionan de la siguiente manera:
 
-$$\text{Activos}=\text{Ocupados}+\text{Parados}$$
-Y el valor Total de la siguiente forma:
-
+El valor de la columna **Total** viene definido con la siguiente expresión:
 
 $$\text{Total}=\text{Activos}+\text{Inactivos}$$
+Y los **Activos** se dividen en Ocupados y Parados:
+
+$$\text{Activos}=\text{Ocupados}+\text{Parados}$$
+## Fórmulas para el análisis (Tasas)
+
+Las tasas permiten normalizar los datos y son la base para el análisis de brechas y series temporales:
 
 
 
+La **tasa de paro** mide la proporción de la población activa que está desempleada:
 
-# Limpieza de los datos
+$$\text{Tasa de paro}=\frac{\text{Parados}}{\text{Activos}} \cdot 100$$
 
-**Pasos para la limpieza de datos:**
+La **tasa de actividad** mide la participación de una población en el mercado laboral:
 
-1. Ver la codificación del archivo para compilarlo con la codificación correcta.
+$$\text{Tasa de actividad}=\frac{\text{Activos}}{\text{Total}} \cdot 100$$
+La **tasa de ocupación** muestra qué parte de la población total de referencia tiene un empleo:
 
-2. Importar los datos teniendo en cuenta que los valores NA son ".." y poner el signo decimal como ",".
+$$\text{Tasa de ocupación}=\frac{\text{Ocupados}}{\text{Total}} \cdot 100$$
 
-3. Ver qué formato tienen las variables.
 
-4. Limpiar el dataframe usando tidyverse:
-- Redefinir "Relación con la actividad económica" por una más corta ("Situacion_Laboral")
-- Cambiar el formato de las variables
 
-4. Ver en qué columna y la cantidad de valores NA con `sapply(df, function(x) sum(is.na(x)))`
+# Proceso de limpieza y transformación de los datos
 
-5. Se guarda en un dataframe `df_na` las instancias con na 
 
-6. Transformar el dataframe a un dataframe tidy:
-- utilizando los valores de "Situacion_Laboral"
+## Importación y verificación inicial
 
-7. Poner a 0 los valores NA
-Los valores faltantes son aquellos valores correspondientes al grupo de edades altos de paro o en busca de trabajo. Estos valores rondan el valor 0 (los que están en el dataframe) entonces se opta poner a 0 todos esos valores para no perder las instancias.
-
-8. Añadir columnas de Tasa de Paro, Tasa de Actividad y Tasa de Ocupación
+- **Codificación e importación**: Se verifica la codificación y se importa el archivo CSV delimitado por tabulaciones, se indica que el separador decimal es la coma y que los valores *NA* están representados por `r".."`
 
 
 ```{r}
@@ -75,16 +71,46 @@ archivo<-"data/65948.csv"
 guess_encoding(archivo)
 ```
 
-# Limpieza avanzada y transformación de los datos
-
 ```{r}
 df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ",")) %>% rename(Situacion_Laboral = "Relación con la actividad económica") %>% filter(Sexo != "Ambos sexos", Edad != "Total") %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
+
+- Se comprueba la estructura inicial con `r str()`
+
+```{r}
+str(df)
+```
+
+- Se comprueba las columnas que tienen valores *NA*
+
+```{r}
+sapply(df,function(x) sum(is.na(x)))
+```
+
+## Limpieza y filtrado
+
+- Se guarda en un dataframe `r df_na` las instancias con *NA*
+
 ```{r}
 # Guardar los valores NA por si los necesitamos
 df_na<-df[which(is.na(df$Total)),]
 ```
 
+Se transforma el dataframe a formato tidy, se elimina la información redundante que causa errores matemáticos y estadísticos.
+
+- **Renombrar columnas**: Utilizando `r rename()` para acortar `r "Relación con la actividad económica` por `r "Situacion_Laboral"` para simplificar el manejo de columnas.
+
+- **Filtrado de doble conteo**: Se eliminan las instancias donde las variables representan la suma de otras instancias (`r Sexo="Ambos sexos"` y `r Edad="Total"`)
+
+- **Se aplica `r pivot_wider()`** utilizando los valores de la columna `r Situacion_Laboral` para crear las nuevas columnas (`r names_from`) y los valores numéricos de la columna `r Total`. De esta forma se cumple la regla tidy de una variable por columna.
+
+- **Renombrar variables**: Se renombra la columna `r "parados que buscan primer empleo"` a un formato más corto `r "Parados_sin_exp"`
+
+- **Imputación de NA a 0**: Los valores faltantes se concentran en categorías como Personas mayores de 65 en paro o que buscan su primer empleo. El INE suprime el dato por ser un valor insignificante, por lo que se opta por remplazar los valores nulos a 0 para no perder el resto de información válida de la instancia.
+
+- **Creación de tasas**: Se añaden las columnas `r Tasa_paro`, `r Tasa_actividad` y `r Tasa_ocupacion` utilizando `r mutate()` y las expresiones de la EPA.
+
+- **Ordenación en factores**: Se ordena la columna `r Edad` como un factor ordinal y la columna `r Sexo` como factor nominal.
 
 ```{r}
 orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","70 y más años")
@@ -93,16 +119,21 @@ df_final<-df %>% pivot_wider(names_from = Situacion_Laboral,values_from = Total)
 ```
 
 
+## Vista general de la limpieza 
+
+
+
 ```{r}
 str(df_final)
 ```
 
+Comprobar que no haya valores nulos:
 
 ```{r}
 sapply(df_final,function(x) sum(is.na(x)))
 ```
 
-
+Valores estadísticos:
 
 ```{r}
 summary(df_final)
