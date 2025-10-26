@@ -22,6 +22,7 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(janitor)
+library(forcats)
 ```
 
 
@@ -37,6 +38,8 @@ Y el valor Total de la siguiente forma:
 
 
 $$\text{Total}=\text{Activos}+\text{Inactivos}$$
+
+
 
 
 # Limpieza de los datos
@@ -75,59 +78,36 @@ guess_encoding(archivo)
 # Limpieza avanzada y transformación de los datos
 
 ```{r}
-df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
+df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ",")) %>% rename(Situacion_Laboral = "Relación con la actividad económica") %>% filter(Sexo != "Ambos sexos", Edad != "Total") %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
-
-```{r}
-str(df)
-```
-
-```{r}
-# Limpiar el dataframe usando tidyverse
-df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% filter(Sexo!="Ambos sexos", Edad !="Total") %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
-```
-
 ```{r}
 # Guardar los valores NA por si los necesitamos
 df_na<-df[which(is.na(df$Total)),]
 ```
 
+
 ```{r}
-df_tidy <- df_limpio  %>%
-  # Creamos nuevas columnas a partir de los valores de 'Situacion_Laboral'
-  pivot_wider(
-    names_from = Situacion_Laboral, # Los nombres de las nuevas columnas vienen de aquí
-    values_from = Total            # Los valores de las nuevas columnas vienen de aquí
-  ) %>% mutate(across(.cols=all_of(c("Parados","Parados que buscan primer empleo")),.fns=~replace_na(.,0))) %>% rename(Parados_sin_exp = `Parados que buscan primer empleo`) 
+orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","70 y más años")
+
+df_final<-df %>% pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% rename(Parados_sin_exp="Parados que buscan primer empleo") %>% mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% mutate(Edad=fct_relevel(Edad,orden_edad))
 ```
 
 
 ```{r}
-levels_sexo<-levels(df_tidy$Sexo)
-levels_edad<-levels(df_tidy$Edad)
-# La Edad es una variable ordinal, dado que sus variables tienen un orden intrínseco es necesario ordenarlas
-orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","De 70 y más años")
-df_tidy$Edad<-factor(df_tidy$Edad,levels = levels_edad, labels = orden_edad )
+str(df_final)
+```
 
+
+```{r}
+sapply(df_final,function(x) sum(is.na(x)))
 ```
 
 
 
 ```{r}
-sapply(df_tidy,function(x) sum(is.na(x)))
+summary(df_final)
 ```
 
-```{r}
-df_tidy$Tasa_paro<-df_tidy$Parados/df_tidy$Activos*100
-df_tidy$Tasa_actividad<-df_tidy$Activos/df_tidy$Total*100
-df_tidy$Tasa_ocupacion<-df_tidy$Ocupados/df_tidy$Total*100
-```
 
-```{r}
-summary(df_tidy)
-```
-```{r}
-str(df_tidy)
-```
 
 
