@@ -57,7 +57,8 @@ $$\text{Total}=\text{Activos}+\text{Inactivos}$$
 
 5. Se guarda en un dataframe `df_na` las instancias con na 
 
-6. Transformar el dataframe a un dataframe tidy utilizando los valores de "Situacion_Laboral"
+6. Transformar el dataframe a un dataframe tidy:
+- utilizando los valores de "Situacion_Laboral"
 
 7. Poner a 0 los valores NA
 Los valores faltantes son aquellos valores correspondientes al grupo de edades altos de paro o en busca de trabajo. Estos valores rondan el valor 0 (los que están en el dataframe) entonces se opta poner a 0 todos esos valores para no perder las instancias.
@@ -83,7 +84,7 @@ str(df)
 
 ```{r}
 # Limpiar el dataframe usando tidyverse
-df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
+df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% filter(Sexo!="Ambos sexos", Edad !="Total") %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
 
 ```{r}
@@ -92,25 +93,23 @@ df_na<-df[which(is.na(df$Total)),]
 ```
 
 ```{r}
-df_tidy <- df_limpio %>%
+df_tidy <- df_limpio  %>%
   # Creamos nuevas columnas a partir de los valores de 'Situacion_Laboral'
   pivot_wider(
     names_from = Situacion_Laboral, # Los nombres de las nuevas columnas vienen de aquí
     values_from = Total            # Los valores de las nuevas columnas vienen de aquí
-  ) %>% mutate(across(.cols=all_of(c("Parados","Parados que buscan primer empleo")),.fns=~replace_na(.,0))) %>% rename(Parados_sin_exp = `Parados que buscan primer empleo`)
+  ) %>% mutate(across(.cols=all_of(c("Parados","Parados que buscan primer empleo")),.fns=~replace_na(.,0))) %>% rename(Parados_sin_exp = `Parados que buscan primer empleo`) 
 ```
 
 
 ```{r}
-levels_sexo<-levels(df_limpio$Sexo)
-levels_edad<-levels(df_limpio$Edad)
-# La Edad es una variable ordinal, dado que sus variables tienen un orden intrínseco es necesario ordenar 
-orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","De 70 y más años","Total")
-df_limpio$Edad<-factor(df_limpio$Edad,levels = levels_edad, labels = orden_edad )
+levels_sexo<-levels(df_tidy$Sexo)
+levels_edad<-levels(df_tidy$Edad)
+# La Edad es una variable ordinal, dado que sus variables tienen un orden intrínseco es necesario ordenarlas
+orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","De 70 y más años")
+df_tidy$Edad<-factor(df_tidy$Edad,levels = levels_edad, labels = orden_edad )
 
 ```
-
-
 
 
 
