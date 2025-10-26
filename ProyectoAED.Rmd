@@ -105,6 +105,9 @@ df_tidy <- df_limpio %>%
 levels_sexo<-levels(df_limpio$Sexo)
 levels_edad<-levels(df_limpio$Edad)
 # La Edad es una variable ordinal, dado que sus variables tienen un orden intrínseco es necesario ordenar 
+orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","De 70 y más años","Total")
+df_limpio$Edad<-factor(df_limpio$Edad,levels = levels_edad, labels = orden_edad )
+
 ```
 
 
