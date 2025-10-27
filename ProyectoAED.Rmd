@@ -71,8 +71,9 @@ archivo<-"data/65948.csv"
 guess_encoding(archivo)
 ```
 
+
 ```{r}
-df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ",")) %>% rename(Situacion_Laboral = "Relación con la actividad económica") %>% filter(Sexo != "Ambos sexos", Edad != "Total") %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral))
+df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ",")) %>% rename(Situacion_Laboral = "Relación con la actividad económica") %>% filter(Sexo != "Ambos sexos",Situacion_Laboral !="Total", Edad != "Total") %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
 
 - Se comprueba la estructura inicial:
@@ -115,8 +116,16 @@ Se transforma el dataframe a formato tidy, se elimina la información redundante
 ```{r}
 orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","70 y más años")
 
-df_final<-df %>% pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% rename(Parados_sin_exp="Parados que buscan primer empleo") %>% mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% mutate(Edad=fct_relevel(Edad,orden_edad))
+# df_final<-df %>% pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% rename(Parados_sin_exp="Parados que buscan primer empleo") %>% mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% mutate(Edad=fct_relevel(Edad,orden_edad))
+
+df_final<-df %>% mutate(across(.cols=c(Total),.fns=~replace_na(.,0))) %>% mutate(Situacion_Laboral=recode(Situacion_Laboral,"Parados que buscan primer empleo"="Parados_sin_exp"))
 ```
+
+
+Se ha utilizado el formato ancho para facilitar el cáculo de indicadores como la tasa de paro, activadad y ocupación debido a que este formato permite operar directamente entre columnas. 
+Sin embargo, para el análisis exploratorio y la visualización es mejor volver al formato largo para facilitar la comparación entre categorías ya que este formato es el favorito para el ecosistema de tidyverse.
+
+
 
 
 ## Vista general de la limpieza 
@@ -139,6 +148,9 @@ Valores estadísticos:
 summary(df_final)
 ```
 
+```{r}
+levels(df$Situacion_Laboral)
+```
 
 
 
