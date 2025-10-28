@@ -17,3 +17,42 @@ rm(list=ls())
 
 ## GRAFICAS JOE
 
+
+IMPORTAMOS EL ARCHIVO CSV
+
+```{r}
+library(readr)
+df_clean <- read_csv("data/df_clean.csv")
+
+```
+
+Aggrupación de datos por periodo y por sexo
+```{r}
+# Calculamos la media de la tasa de actividad para cada grupo
+# Usamos na.rm = TRUE para ignorar valores faltantes
+# .groups = "drop" elimina la agrupación después del resumen
+df_p_sexo <- df_clean %>% group_by(Periodo, Sexo) %>% summarise(tasa_actividad = mean(Tasa_actividad, na.rm = TRUE) #Hay que ignorar los valores NA
+                                                                , .groups = "drop") #hay que eliminar esas agrupaciones 
+
+#Que pretendemos? Calcular la media de la tasa de actividad de todos los grupos del df
+
+
+
+```
+
+```{r}
+# Gráfica 
+library(ggplot2)
+ggplot(df_p_sexo, aes(x = Periodo, y = tasa_actividad, color = Sexo)) + geom_line(linewidth = 2) +  labs(title = "Tasa de actividad según sexo (2006–2024)", x = "Año", y = "% Tasa de actividad",color = "Sexo") + theme_minimal()  
+
+# Eje X:Periodo -  Eje Y: tasa de actividad promedio
+
+
+```
+
+
+
+
+
+
+
