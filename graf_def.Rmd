@@ -70,10 +70,7 @@ df_sexo_edad <- df_clean %>% group_by(Periodo, Sexo, Edad) %>% summarise(tasa_ac
 
 ```{r}
 
-ggplot(df_sexo_edad, aes(x = Periodo, y = tasa_actividad, color = Edad)) + geom_line(linewidth = 1) +  facet_wrap(~Sexo) + scale_x_continuous(breaks = seq(2006, 2024, by = 2)) + scale_y_continuous(labels = scales::comma) +  labs(title = "Tasa de actividad por edad y sexo (2006–2024)", x = "Año", y = "Tasa de actividad (%)", color = "Edad") +
-  theme_minimal() 
-
-
+ggplot(df_sexo_edad, aes(x = Periodo, y = tasa_actividad, color = Edad)) + geom_line(linewidth = 1) +  facet_wrap(~Sexo) + scale_x_continuous(breaks = seq(2006, 2024, by = 2)) + scale_y_continuous(labels = scales::comma) +  labs(title = "Tasa de actividad por edad y sexo (2006–2024)", x = "Año", y = "Tasa de actividad (%)", color = "Edad") + theme_minimal()  + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
 
 ```
 
