@@ -87,11 +87,23 @@ ggplot(df_paro_sexo, aes(x = Periodo, y = tasa_paro, color = Sexo)) + geom_line(
 ```
 
 
+Distribución de ocupados e inactivos por sexo
+
+```{r}
+df_ocup_inact <- df_clean %>%
+  group_by(Sexo) %>%
+  summarise(
+    Ocupados = sum(Ocupados, na.rm = TRUE),
+    Inactivos = sum(Inactivos, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = c(Ocupados, Inactivos), names_to = "Situacion", values_to = "Personas")
 
 
+```
 
-
-
-
-
+```{r}
+ggplot(df_ocup_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Distribución de ocupados e inactivos por sexo", x = "Sexo", y = "Personas")
+```
 
