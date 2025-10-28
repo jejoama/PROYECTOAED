@@ -21,7 +21,6 @@ rm(list=ls())
 library(readr)
 library(dplyr)
 library(tidyr)
-library(janitor)
 library(forcats)
 ```
 
