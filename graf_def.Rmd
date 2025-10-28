@@ -78,6 +78,13 @@ ggplot(df_sexo_edad, aes(x = Periodo, y = tasa_actividad, color = Edad)) + geom_
 ```
 
 
+TASA DE PARO POR SEXO
+```{r}
+df_paro_sexo <- df_clean %>% group_by(Periodo, Sexo) %>% summarise(tasa_paro = mean(Tasa_paro, na.rm = TRUE), .groups = "drop")
+
+ggplot(df_paro_sexo, aes(x = Periodo, y = tasa_paro, color = Sexo)) + geom_line() + scale_x_continuous(breaks = seq(2006, 2024, by = 2))+ labs(title = "Tasa de paro por sexo (2006–2024)", x = "Año", y = "Tasa de paro (%)") + theme_minimal()
+
+```
 
 
 
