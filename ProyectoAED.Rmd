@@ -73,7 +73,7 @@ guess_encoding(archivo)
 
 
 ```{r}
-df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ",")) %>% rename(Situacion_Laboral = "Relación con la actividad económica") %>% filter(Sexo != "Ambos sexos", Edad != "Total") %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral))
+df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
 
 - Se comprueba la estructura inicial:
@@ -116,9 +116,20 @@ Se transforma el dataframe a formato tidy, se elimina la información redundante
 ```{r}
 orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 34 años","De 35 a 39 años","De 40 a 44 años","De 45 a 49 años","De 50 a 54 años","De 55 a 59 años","De 60 a 64 años","De 65 a 69 años","70 y más años")
 
-df_ancho<-df %>% pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% rename(Parados_sin_exp="Parados que buscan primer empleo") %>% mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% mutate(Edad=fct_relevel(Edad,orden_edad))
+df_ancho<-df %>% 
+  rename(Situacion_Laboral = "Relación con la actividad económica") %>% 
+  filter(Sexo != "Ambos sexos", Edad != "Total") %>% 
+  mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral)) %>%
+  pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% 
+  rename(Parados_sin_exp="Parados que buscan primer empleo") %>% 
+  mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% 
+  mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% 
+  mutate(Edad=fct_relevel(Edad,orden_edad))
 
 ```
+
+
+Guardar el dataframe limpio:
 
 ```{r}
 write_csv(df_ancho,file = "data/df_clean.csv")
@@ -126,9 +137,7 @@ write_csv(df_ancho,file = "data/df_clean.csv")
 
 
 
-
 ## Vista general de la limpieza 
-
 
 
 ```{r}
