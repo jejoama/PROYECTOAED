@@ -118,17 +118,11 @@ orden_edad<-c("De 16 a 19 años","De 20 a 24 años","De 25 a 29 años","De 30 a 
 
 df_ancho<-df %>% pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% rename(Parados_sin_exp="Parados que buscan primer empleo") %>% mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% mutate(Edad=fct_relevel(Edad,orden_edad))
 
-# 
-# df_largo <- df %>%
-#   mutate(Total = replace_na(Total, 0)) %>%  # asegurar que Total no tiene NA
-#   mutate(Situacion_Laboral = recode(Situacion_Laboral,
-#                                     "Parados que buscan primer empleo" = "Parados_sin_exp"))%>% mutate(Edad=fct_relevel(Edad,orden_edad))
-
 ```
 
-
-Se ha utilizado el formato ancho para facilitar el cáculo de indicadores como la tasa de paro, activadad y ocupación debido a que este formato permite operar directamente entre columnas. 
-Sin embargo, para el análisis exploratorio y la visualización es mejor volver al formato largo para facilitar la comparación entre categorías ya que este formato es el favorito para el ecosistema de tidyverse.
+```{r}
+write_csv(df_ancho,file = "data/df_clean.csv")
+```
 
 
 
