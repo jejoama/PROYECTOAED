@@ -130,10 +130,47 @@ ggplot(a2, aes(x = factor(Edad, levels = unique(Edad)), y = brecha_paro)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45,hjust = 1) )
 
+```
+```{r}
+library(tidyr)
+library(dplyr)
+
+df_composicion <- datos %>%
+  select(Sexo, Edad, Periodo, Ocupados, Parados, Inactivos) %>%
+  pivot_longer(
+    cols = c(Ocupados, Parados, Inactivos),
+    names_to = "Categoria",      
+    values_to = "Total"           
+  )
+
+df_composicion %>% 
+  group_by(Periodo,Categoria) %>% 
+  summarise(Total=sum(Total),groups="drop") %>% pivot_wider(
+    names_from = Categoria,
+    values_from = Total
+  ) %>%
+  arrange(Periodo)
 
 
+library(dplyr)
+library(tidyr)
+
+df_total <- df_composicion %>%
+  group_by(Periodo, Categoria) %>%
+  summarise(Total = sum(Total, na.rm = TRUE), .groups = "drop") %>%
+  
+  pivot_wider(
+    names_from = Categoria,
+    values_from = Total
+  ) %>%
+  
+  arrange(Periodo)
+df_total$Total=df_total$Parados+df_total$Inactivos+df_total$Ocupados
+df_total
+#ggplot(df_total,aes(x=Periodo,y=Total,fill = Categoria))+geom_area()+facet_grid()
 
 ```
+
 
 
 
