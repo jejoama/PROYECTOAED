@@ -1,0 +1,139 @@
+---
+title: "Comparación brecha Proyecto"
+output: html_document
+date: "2025-10-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Gráficos Brecha
+Importamos el dataframe para trabajar con el: 
+```{r}
+datos<-read.csv("data/df_clean.csv")
+
+```
+
+Tenemos el dataframe, listo para trabajar cargado en la variable datos.
+
+##Evolucion de la tasa de paro por género y evolución de la brecha de la tasa de paro por género
+
+Para el análisis de la evolución de la brecha de género en la tasa de paro, debemos crear una tabla, que analizará la diferencia entre esas tasas para hombres y mujeres 
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# 1º crear una tabla con la variable brecha_paro 
+brecha <- datos %>% 
+  select(Periodo, Edad,Sexo,Tasa_paro) %>% 
+  pivot_wider(names_from = Sexo, values_from = Tasa_paro) %>% 
+  mutate(brecha_paro=Mujeres-Hombres)
+brecha
+
+#2º Agrupar esas fechas por periodo, para asi no diferenciar entre grupos de edades y tener la brecha total
+brechas_total <- brecha %>%
+  group_by(Periodo) %>%
+  summarise(
+    tasa_hombres = mean(Hombres, na.rm = TRUE),
+    tasa_mujeres = mean(Mujeres, na.rm = TRUE),
+    brecha_paro_total = mean(brecha_paro, na.rm = TRUE)
+  )
+brechas_total
+
+evo_brecha_total <- ggplot(brechas_total,aes(x=Periodo,y=brecha_paro_total)) + geom_line()+geom_point()+labs(title = "Evolución de la brecha de paro total",x="años",y="Brecha de tasa de paro")
+evo_brecha_total
+evo_tasa_total <-  ggplot(brechas_total, aes(x = Periodo)) +geom_line(aes(y = tasa_hombres, color = "Hombres")) +geom_point(aes(y = tasa_hombres, color = "Hombres")) +geom_line(aes(y = tasa_mujeres, color = "Mujeres")) +geom_point(aes(y = tasa_mujeres, color = "Mujeres")) +labs(title = "Evolución de la tasa de paro total por sexo",x = "Año",y = "Tasa de paro (%)",color = "Sexo")
+evo_tasa_total
+
+
+evo_tasa_y_brecha<-ggplot(brechas_total, aes(x = Periodo)) +geom_line(aes(y = tasa_hombres, color = "Hombres"), size = 1.3) +geom_point(aes(y = tasa_hombres, color = "Hombres"), size = 2) +geom_line(aes(y = tasa_mujeres, color = "Mujeres"), size = 1.3) +geom_point(aes(y = tasa_mujeres, color = "Mujeres"), size = 2) +geom_line(aes(y = brecha_paro_total, color = "Brecha"), size = 1.2,) +geom_point(aes(y = brecha_paro_total, color = "Brecha"), size = 2) +labs(title = "Evolución de la tasa de paro total por sexo y brecha",x = "Año",y = "Tasa de paro (%)",) +scale_color_manual(values = c("Hombres" = "blue", "Mujeres" = "red", "Brecha" = "black"))+theme_minimal()
+evo_tasa_y_brecha
+
+```
+## Evolucion de la tasa de paro y su brecha por grupo de edad
+A continuación haremos el análisis de como ha evolucionado la tasa de  paro por grupo de edad y también de como ha evolucionado la diferencia entre ambos generos.
+Para ello necesitaremos hacer un pivot_wider.
+```{r}
+brecha_edades <- datos %>% 
+  select(Sexo, Edad, Periodo,Tasa_paro) %>% 
+  pivot_wider(names_from = Sexo, values_from = Tasa_paro) %>% 
+  mutate(brecha_paro=Mujeres-Hombres)
+brecha_edades
+
+unique(brecha_edades$Edad)
+library(ggplot2)
+#Para hacerlo con un unico dataframe, es muy complejo de graficar, asi que es mejor dividirlo en varios dataframes, para que así sea mas sencillo trabajar
+edades_1 <- c("De 16 a 19 años", "De 20 a 24 años", "De 25 a 29 años", "De 30 a 34 años")
+edades_2 <- c("De 35 a 39 años", "De 40 a 44 años", "De 45 a 49 años", "De 50 a 54 años")
+edades_3 <- c("De 55 a 59 años", "De 60 a 64 años", "De 65 a 69 años", "De 70 y más años")
+
+df_1 <- brecha_edades %>% filter(Edad %in% edades_1)
+df_2 <- brecha_edades %>% filter(Edad %in% edades_2)
+df_3 <- brecha_edades %>%  filter(Edad %in% edades_3)
+
+ggplot(df_1, aes(x = Periodo, y = brecha_paro)) +
+  geom_line( size = 1.2) +
+  geom_point(size = 2) +
+  facet_wrap(~ Edad, ncol = 2) +  # ← cuadrícula 2×2
+  labs(title = "Evolución de la brecha de paro (Mujeres - Hombres)",x = "Año",y = "Brecha") +
+  theme_minimal()
+
+ggplot(df_2, aes(x = Periodo, y = brecha_paro)) +
+  geom_line( size = 1.2) +
+  geom_point(size = 2) +
+  facet_wrap(~ Edad, ncol = 2) +  
+  labs(title = "Evolución de la brecha de paro (Mujeres - Hombres)",x = "Año",y = "Brecha") +
+  theme_minimal()
+
+ggplot(df_3, aes(x = Periodo, y = brecha_paro)) +
+  geom_line( size = 1.2) +
+  geom_point(size = 2) +
+  facet_wrap(~ Edad, ncol = 2) +  
+  labs(title = "Evolución de la brecha de paro (Mujeres - Hombres)",x = "Año",y = "Brecha") +
+  theme_minimal()
+
+colores_vivos <- c(
+  "#FF4B00", "#00FFFF", "#FFD300", "#FF1493",
+  "#00FF00", "#1E90FF", "#FF7F50", "#ADFF2F",
+  "#DA70D6", "#FF4500", "#00CED1", "#FFFF66"
+)
+ggplot(brecha_edades, aes(x = Periodo, y = brecha_paro,colour = Edad)) +
+  geom_line( size = 0.5) +
+  geom_point()  +
+  labs(title = "Evolución de la brecha de paro (Mujeres - Hombres)",x = "Año",y = "Brecha") +
+  theme_dark()
+```
+## Gráfica de Barras comparación grupos de edades con mayor brecha en 2006 y en 2024
+
+```{r}
+a1<- brecha_edades %>% filter(Periodo %in% 2024)
+
+
+library(ggplot2)
+library(dplyr)
+
+rango_y <- range(brecha_edades$brecha_paro)
+
+ggplot(a1, aes(x = factor(Edad, levels = unique(Edad)), y = brecha_paro)) +
+  geom_col(fill = "blue") +
+  ylim(rango_y)+
+  labs(title = "Brecha de paro por grupo de edad (año 2024)",x = "Grupo de edad",y = "Brecha ") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,hjust = 1))
+a2<-brecha_edades %>% filter(Periodo%in%2006)
+
+ggplot(a2, aes(x = factor(Edad, levels = unique(Edad)), y = brecha_paro)) +
+  geom_col(fill = "blue") +
+ ylim(rango_y) +
+  labs(title = "Brecha de paro por grupo de edad (año 2006)",x = "Grupo de edad",y = "Brecha ") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,hjust = 1) )
+
+
+
+
+```
+
+
+
