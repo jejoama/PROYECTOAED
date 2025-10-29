@@ -155,6 +155,17 @@ Valores estadísticos:
 summary(df_ancho)
 ```
 
+```{r}
+edades_focales <- c(
+  "De 25 a 29 años", 
+  "De 30 a 34 años", 
+  "De 35 a 39 años", 
+  "De 40 a 44 años", 
+  "De 45 a 49 años", 
+  "De 50 a 54 años"
+)
+t.test(Tasa_actividad ~ Sexo, data = df_ancho%>% filter(Periodo == 2024,Edad%in%edades_focales))
+```
 
 
 
