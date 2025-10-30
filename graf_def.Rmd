@@ -30,7 +30,7 @@ Aggrupación de datos por periodo y por sexo
 ```{r}
 # Calculamos la media de la tasa de actividad para cada grupo
 # Usamos na.rm = TRUE para ignorar valores faltantes
-# .groups = "drop" elimina la agrupación después del resumen
+
 df_p_sexo <- df_clean %>% group_by(Periodo, Sexo) %>% summarise(tasa_actividad = mean(Tasa_actividad, na.rm = TRUE) #Hay que ignorar los valores NA
                                                                 , .groups = "drop") #hay que eliminar esas agrupaciones 
 
