@@ -107,6 +107,12 @@ ggplot(df_ocup_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
 
 
 
+
+
+
+
+
+
 Estadisiticas
 ```{r}
 df_brecha_genero <- df_clean %>% group_by(Periodo, Sexo) %>% summarise(tasa = mean(Tasa_actividad, na.rm = TRUE), .groups = "drop") %>% pivot_wider(names_from = Sexo, values_from = tasa) %>% mutate(Brecha = Hombres - Mujeres)
@@ -197,4 +203,67 @@ ggplot(brecha_edad_filtrada, aes(x = Periodo, y = Razon, color = Edad)) +
 
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+df_feminizacion <- df_clean %>%
+  group_by(Periodo, Edad, Sexo) %>%
+  summarise(Ocupados = sum(Ocupados), .groups = "drop") %>%
+  pivot_wider(names_from = Sexo, values_from = Ocupados) %>%
+  mutate(Indice_feminizacion = Mujeres / (Hombres + Mujeres) * 100)
+
+df_feminizacion
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+ggplot(df_feminizacion, aes(x = Periodo, y = Indice_feminizacion, color = Edad)) +
+  geom_line(size = 1.2) +
+  labs(
+    title = "Índice de feminización en ocupación por edad (2006–2024)",
+    x = "Año",
+    y = "Porcentaje de mujeres (%)",
+    color = "Grupo de edad"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+las mujeres tienen mayor presencia en la ocupación en los grupos de edad entre 30 y 54 años, especialmente desde 2010. 
+los jóvenes (16–24 años) y mayores (65+) presentan menor participación femenina y más fluctuaciones.
+
+
+
+
+
+
+
+
+
+
+
+test 
+```{r}
+df_largo <- df_clean %>%
+  pivot_longer(cols = c(Ocupados, Parados, Inactivos), names_to = "Situacion", values_to = "Personas")
+
+tabla <- table(df_largo$Sexo, df_largo$Situacion)
+chisq.test(tabla)
+
+
+```
+
+
+
 
