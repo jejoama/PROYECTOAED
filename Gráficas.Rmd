@@ -7,24 +7,16 @@ date: "2025-10-25"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+   
 # Documento para la elaboración de gráficas
-
-```{r}
-# Aquí habría que hacer algún scrip para descargar las librerías si no las tienen
-library(readr)
-library(dplyr)
-library(tidyr)
-library(janitor)
-library(forcats)
-```
 
 
 ##### LIMPIEZA AGAIN = copypaste de Javi
 
 ```{r}
-#Ver el tipo de codificación del archivo
-library(readr)
+# Ver el tipo de codificación del archivo
+library(dplyr)
+library(dplyr)
 archivo<-"data/65948.csv"
 guess_encoding(archivo)
 ```
@@ -54,7 +46,6 @@ str(df)
 
 ```{r}
 # Limpiar el dataframe usando tidyverse
-library(tidyr)
 df_limpio<-df %>% rename(Situacion_Laboral = `Relación con la actividad económica`) %>% mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad), Situacion_Laboral=as.factor(Situacion_Laboral))
 ```
 
