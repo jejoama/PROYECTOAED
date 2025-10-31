@@ -156,7 +156,8 @@ brecha_relativa <- df_clean %>%
   mutate(Razon = Hombres / Mujeres)
 
 brecha_relativa
-#f
+#j
+#l
 
 ```
 
@@ -265,6 +266,12 @@ chisq.test(tabla)
 
 ```
 
+
+```{bash}
+git add Gráficas.Rmd graf_def.Rmd
+git commit -m "Guardando antes de cambiar de rama"
+git checkout graf_def
+```
 
 
 
