@@ -7,7 +7,7 @@ date: "2025-10-25"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+   
 # Documento para la elaboración de gráficas
 
 
