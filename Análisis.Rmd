@@ -261,7 +261,7 @@ datos %>%
 })
 
 graficos_parados_proporcion_por_año
-
+#que tal ??
 ```
 
 
