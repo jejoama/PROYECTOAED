@@ -38,21 +38,54 @@ Este artículo presenta un enfoque en R para el Análisis Exploratorio de Datos 
 ## Carga de Librerías
 
 ```{r}
+# Manejo de datos
 library(readr)
 library(dplyr)
 library(tidyr)
+library(stringr)
 library(forcats)
+
+# Visualización
 library(ggplot2)
 library(gganimate)
 library(gifski)
-library(stringr)
 ```
 
 # Exploración inicial
 
-## Datos cargados (Los originales)
+## Importación y verificación inicial
+
+- **Codificación e importación**: Se verifica la codificación y se importa el archivo CSV delimitado por tabulaciones, se indica que el separador decimal es la coma y que los valores *NA* están codificados como `".."`
+
+```{r}
+archivo<-"data/65948.csv"
+guess_encoding(archivo)
+```
+
+```{r}
+df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
+```
+
+Se comprueba la estructura inicial de los datos
+
+```{r}
+str(df)
+```
 
 ## Valores faltantes
+
+Con el objetivo de ver la cantidad de los datos faltantes la variable que tiene estos datos se utiliza la siguiente función: 
+```{r}
+sapply(df,function(x) sum(is.na(x)))
+```
+
+Todos los valores ausentes se encuentran en `Total`
+
+```{r}
+head(df[which(is.na(df$Total)),])
+```
+
+Se observa que los valores faltantes vienen asociados a grupos de edad altos, para cualquier Sexo y cuya relación con la actividad económica es "Parados que buscan primer empleo" o "Parados"
 
 # Limpieza
 
@@ -108,45 +141,9 @@ $$\text{Tasa de ocupación}=\frac{\text{Ocupados}}{\text{Total}} \cdot 100$$
 
 
 
-# Proceso de limpieza y transformación de los datos
-
-
-## Importación y verificación inicial
-
-- **Codificación e importación**: Se verifica la codificación y se importa el archivo CSV delimitado por tabulaciones, se indica que el separador decimal es la coma y que los valores *NA* están representados por `r".."`
-
-
-```{r}
-# Ver el tipo de codificación del archivo
-archivo<-"data/65948.csv"
-guess_encoding(archivo)
-```
-
-
-```{r}
-df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
-```
-
-- Se comprueba la estructura inicial:
-
-```{r}
-str(df)
-```
-
-- Se comprueba las columnas que tienen valores *NA*
-
-```{r}
-sapply(df,function(x) sum(is.na(x)))
-```
-
 ## Limpieza y filtrado
 
-- Se guarda en un dataframe `df_na` las instancias con *NA*
 
-```{r}
-# Guardar los valores NA por si los necesitamos
-df_na<-df[which(is.na(df$Total)),]
-```
 
 Se transforma el dataframe a formato tidy, se elimina la información redundante que causa errores matemáticos y estadísticos.
 
