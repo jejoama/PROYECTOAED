@@ -1,36 +1,12 @@
 ---
 title: Evolución de la actividad, ocupación para grupos de edad mayores de 16 años
 author:
-  - name: Dominik Leutnant
-    affil: 1,2,\ddagger,*
-    orcid: 0000-0003-3293-2315
-  - name: John Doe
-    affil: 2, \dagger, \ddagger
-affiliation:
-  - num: 1
-    address: |
-      Muenster University of Applied Sciences - 
-      Institute for Infrastructure, Water, Resources, Environment
-      Correnstr. 25, 48149 Muenster, Germany
-    email: leutnant@fh-muenster.de
-  - num: 2
-    address: |
-      Your department
-      Street, City, Country
-    email: mail@mail.com
-# author citation list in chicago format
-authorcitation: |
-  Leutnant, D.; Doe, J.
-# firstnote to eighthnote
-firstnote: |
-  Current address: Updated affiliation
-secondnote: |
-  These authors contributed equally to this work.
-correspondence: |
-  leutnant@fh-muenster.de; Tel.: +XX-000-00-0000.
-# document options
+  - name: Jeremy Joel Aguilar Marin
+  - name: Jose Aguilar Milla
+  - name: Javier Herrero Pérez
+
 journal: notspecified
-type: article
+type: casereport
 status: submit
 # front matter
 simplesummary: |
@@ -52,16 +28,16 @@ output:
 
 
 
-```{r}
+```{r,echo = FALSE}
 rm(list=ls())
 ```
 
 # Introducción
+Este artículo presenta un enfoque en R para el Análisis Exploratorio de Datos de la Encuesta de Población Activa (EPA), centrándose en la evolución histórica de la brecha de género en el mercado laboral español. Utilizando el ecosistema `tidyverse`, el estudio comienza con una limpieza y transformación de los datos empleando `dplyr` y el cálculo de Tasa de paro, actividad y ocupación, claves para el análisis. Seguido de la visualización con `ggplot2` para ilustrar la evolución temporal. Por último, se validan los resultados con pruebas de *t Student* para confirmar la significancia estadística de los resutlados.
 
 ## Carga de Librerías
 
 ```{r}
-# Aquí habría que hacer algún scrip para descargar las librerías si no las tienen
 library(readr)
 library(dplyr)
 library(tidyr)
@@ -91,6 +67,8 @@ library(stringr)
 
 
 # Resultados
+
+
 
 # Conclusión
 
