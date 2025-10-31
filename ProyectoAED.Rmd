@@ -65,7 +65,8 @@ guess_encoding(archivo)
 ```
 
 ```{r}
-df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", trim_ws = TRUE,locale = locale(decimal_mark = ","))
+df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..", 
+               trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
 
 Se comprueba la estructura inicial de los datos
@@ -135,11 +136,14 @@ $$\text{Tasa de ocupación}=\frac{\text{Ocupados}}{\text{Total}} \cdot 100$$
 df_clean<-df %>% 
   rename(Situacion_Laboral = "Relación con la actividad económica") %>% 
   filter(Sexo != "Ambos sexos", Edad != "Total") %>% 
-  mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral)) %>%
+  mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),
+         Situacion_Laboral=as.factor(Situacion_Laboral)) %>%
   pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% 
   rename(Parados_sin_exp="Parados que buscan primer empleo") %>% 
-  mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% 
-  mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% 
+  mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),
+                .fns=~replace_na(.,0))) %>% 
+  mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,
+         Tasa_ocupacion=Ocupados/Total*100) %>% 
   mutate(
     Edad = str_replace(Edad, "De ", ""),
     Edad = str_replace(Edad, " a ", "-"),
