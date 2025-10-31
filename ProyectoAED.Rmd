@@ -50,20 +50,15 @@ output:
     extra_dependencies: longtable
 ---
 
-# Version
-
-
-
-## Journal Specific YAML variables
-
-
 
 
 ```{r}
 rm(list=ls())
 ```
 
-# Carga de Librerías
+# Introducción
+
+## Carga de Librerías
 
 ```{r}
 # Aquí habría que hacer algún scrip para descargar las librerías si no las tienen
@@ -77,9 +72,35 @@ library(gifski)
 library(stringr)
 ```
 
+# Exploración inicial
+
+## Datos cargados (Los originales)
+
+## Valores faltantes
+
+# Limpieza
+
+## Definición de variables
+
+# Evolución temporal de las tasas
+
+## Evolución de las tasas con la brecha
+
+
+# Distribución de la población en el mercado laboral
+
+
+# Resultados
+
+# Conclusión
+
+# ---------------------------------
+
 
 
 # Significado de los Datos del Mercado Laboral (EPA)
+
+
 
 ## Relaciones Fundamentales
 
