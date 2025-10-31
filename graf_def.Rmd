@@ -30,6 +30,7 @@ Aggrupación de datos por periodo y por sexo
 ```{r}
 # Calculamos la media de la tasa de actividad para cada grupo
 # Usamos na.rm = TRUE para ignorar valores faltantes
+library(tidyverse)
 
 df_p_sexo <- df_clean %>% group_by(Periodo, Sexo) %>% summarise(tasa_actividad = mean(Tasa_actividad, na.rm = TRUE) #Hay que ignorar los valores NA
                                                                 , .groups = "drop") #hay que eliminar esas agrupaciones 
@@ -74,6 +75,44 @@ ggplot(df_sexo_edad, aes(x = Periodo, y = tasa_actividad, color = Edad)) + geom_
 
 ```
 
+```{r}
+df_mujeres <- df_sexo_edad %>% filter(Sexo == "Mujeres")
+
+ggplot(df_mujeres, aes(x = Periodo, y = tasa_actividad, color = Edad)) +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(breaks = seq(2006, 2024, by = 2)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Tasa de actividad por edad – Mujeres (2006–2024)",
+    x = "Año",
+    y = "Tasa de actividad (%)",
+    color = "Edad"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
+
+```
+
+```{r}
+df_hombres <- df_sexo_edad %>% filter(Sexo == "Hombres")
+
+ggplot(df_hombres, aes(x = Periodo, y = tasa_actividad, color = Edad)) +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(breaks = seq(2006, 2024, by = 2)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Tasa de actividad por edad – Hombres (2006–2024)",
+    x = "Año",
+    y = "Tasa de actividad (%)",
+    color = "Edad"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
+```
+
+
+
+
 
 TASA DE PARO POR SEXO
 ```{r}
@@ -104,6 +143,26 @@ ggplot(df_ocup_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
   labs(title = "Distribución de ocupados e inactivos por sexo", x = "Sexo", y = "Personas")
 ```
 
+```{r}
+df_act_inact <- df_clean %>%
+  group_by(Sexo) %>%
+  summarise(
+    Activos = sum(Activos, na.rm = TRUE),
+    Inactivos = sum(Inactivos, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = c(Activos, Inactivos), names_to = "Situacion", values_to = "Personas")
+
+ggplot(df_act_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Distribución de activos e inactivos por sexo",
+    x = "Sexo",
+    y = "Personas",
+    fill = "Situación"
+  ) +
+  theme_minimal()
+
+```
 
 
 
