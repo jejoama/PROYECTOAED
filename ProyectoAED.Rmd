@@ -6,7 +6,7 @@ author:
   - name: Javier Herrero Pérez
 
 journal: notspecified
-type: casereport
+type: article
 status: submit
 # front matter
 simplesummary: |
@@ -87,34 +87,8 @@ head(df[which(is.na(df$Total)),])
 
 Se observa que los valores faltantes vienen asociados a grupos de edad altos, para cualquier Sexo y cuya relación con la actividad económica es "Parados que buscan primer empleo" o "Parados"
 
-# Limpieza
 
-## Definición de variables
-
-# Evolución temporal de las tasas
-
-## Evolución de las tasas con la brecha
-
-
-# Distribución de la población en el mercado laboral
-
-
-# Resultados
-
-
-
-# Conclusión
-
-# ---------------------------------
-
-
-
-# Significado de los Datos del Mercado Laboral (EPA)
-
-
-
-## Relaciones Fundamentales
-
+# Definición de variables
 
 El valor de la columna **Total** viene definido con la siguiente expresión:
 
@@ -139,13 +113,7 @@ La **tasa de ocupación** muestra qué parte de la población total de referenci
 
 $$\text{Tasa de ocupación}=\frac{\text{Ocupados}}{\text{Total}} \cdot 100$$
 
-
-
-## Limpieza y filtrado
-
-
-
-Se transforma el dataframe a formato tidy, se elimina la información redundante que causa errores matemáticos y estadísticos.
+# Limpieza
 
 - **Renombrar columnas**: Utilizando `rename()` para acortar `"Relación con la actividad económica"` por ` "Situacion_Laboral"` para simplificar el manejo de columnas.
 
@@ -162,19 +130,14 @@ Se transforma el dataframe a formato tidy, se elimina la información redundante
 - **Ordenación en factores**: Se ordena la columna `Edad` como un factor ordinal y la columna `Sexo` como factor nominal.
 
 ```{r}
-df_ancho<-df %>% 
+df_clean<-df %>% 
   rename(Situacion_Laboral = "Relación con la actividad económica") %>% 
   filter(Sexo != "Ambos sexos", Edad != "Total") %>% 
   mutate(Sexo=as.factor(Sexo), Edad=as.factor(Edad),Situacion_Laboral=as.factor(Situacion_Laboral)) %>%
   pivot_wider(names_from = Situacion_Laboral,values_from = Total) %>% 
   rename(Parados_sin_exp="Parados que buscan primer empleo") %>% 
   mutate(across(.cols=c(Parados,Parados_sin_exp,Activos,Ocupados,Inactivos),.fns=~replace_na(.,0))) %>% 
-  mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100)
-```
-
-
-```{r}
-df_ancho <- df_ancho %>%
+  mutate(across(c(Activos, Ocupados, Parados, Inactivos, Total), as.numeric),Tasa_paro=Parados/Activos*100,Tasa_actividad=Activos/Total*100,Tasa_ocupacion=Ocupados/Total*100) %>% 
   mutate(
     Edad = str_replace(Edad, "De ", ""),
     Edad = str_replace(Edad, " a ", "-"),
@@ -187,15 +150,43 @@ df_ancho <- df_ancho %>%
       "65-69", "70+"), ordered = T
       )
   )
-
 ```
 
 
-Guardar el dataframe limpio:
+Se comprueba que la limpieza esté bien hecha, primero viendo si el formato de los datos es el adecuado y asegurando que no quedan valores faltantes.
+```{r}
+str(df_clean)
+```
 
 ```{r}
-write_csv(df_ancho,file = "data/df_clean.csv")
+sapply(df_clean,function(x) sum(is.na(x)))
 ```
+
+
+por último se guarda el dataframe limpio con el nombre `df_clean.csv`.
+
+```{r}
+write_csv(df_clean,file = "data/df_clean.csv")
+```
+
+# Evolución temporal de las tasas
+
+## Evolución de las tasas con la brecha
+
+
+# Distribución de la población en el mercado laboral
+
+
+# Resultados
+
+
+
+# Conclusión
+
+# ---------------------------------
+
+
+
 
 
 
@@ -222,25 +213,11 @@ write_csv(df_ancho,file = "data/df_clean.csv")
 ```
 
 
-## Vista general de la limpieza 
 
 
 
-```{r}
-str(df_ancho)
-```
 
-Comprobar que no haya valores nulos:
 
-```{r}
-sapply(df_ancho,function(x) sum(is.na(x)))
-```
-
-Valores estadísticos:
-
-```{r}
-summary(df_ancho)
-```
 
 ```{r}
 edades_focales <- c(
@@ -251,7 +228,7 @@ edades_focales <- c(
   "45-49",
   "50-54"
 )
-t.test(Tasa_ocupacion ~ Sexo, data = df_ancho%>% filter(Periodo == 2024,Edad%in%edades_focales))
+t.test(Tasa_ocupacion ~ Sexo, data = df_clean%>% filter(Periodo == 2024,Edad%in%edades_focales))
 ```
 
 
