@@ -162,9 +162,8 @@ ggplot(df_act_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
   ) +
   theme_minimal()
 
-```
-
-# hola
+``` 
+# hola  
 
 
 # d
