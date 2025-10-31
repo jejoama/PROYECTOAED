@@ -102,17 +102,8 @@ df_ocup_inact <- df_clean %>%
 ggplot(df_ocup_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Distribución de ocupados e inactivos por sexo", x = "Sexo", y = "Personas")
+
 ```
-
-
-
-
-
-
-
-
-
-
 Estadisiticas
 ```{r}
 df_brecha_genero <- df_clean %>% group_by(Periodo, Sexo) %>% summarise(tasa = mean(Tasa_actividad, na.rm = TRUE), .groups = "drop") %>% pivot_wider(names_from = Sexo, values_from = tasa) %>% mutate(Brecha = Hombres - Mujeres)
