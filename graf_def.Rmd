@@ -164,7 +164,7 @@ ggplot(df_act_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
 
 ```
 
-
+# hola
 
 
 # d
