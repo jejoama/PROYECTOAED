@@ -130,6 +130,21 @@ ggplot(a2, aes(x = factor(Edad, levels = unique(Edad)), y = brecha_paro)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45,hjust = 1) )
 
+
+grafico_brecha_paro_por_año<-lapply(años, function(año){
+  brecha_edades %>% 
+    filter(Periodo==año) %>% 
+    ggplot( aes(x = factor(Edad, levels = unique(Edad)), y = brecha_paro)) +
+  geom_col(fill = "blue") +
+ ylim(rango_y) +
+  labs(title = paste("Brecha de paro por grupo de edad -", año),x = "Grupo de edad",y = "Brecha ") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,hjust = 1) )+
+    geom_point(aes(y=mean(brecha_paro)))
+})
+
+grafico_brecha_paro_por_año
+
 ```
 ```{r}
 library(tidyr)
@@ -171,6 +186,83 @@ df_total
 
 ```
 
+```{r}
+head(datos)
+
+
+datos_composicion_2024<- datos %>% 
+  filter(Periodo==2024) %>% 
+  select(Periodo,Edad,Sexo,Activos,Ocupados,Parados,Inactivos) %>% 
+  pivot_longer(cols = c(Inactivos,Ocupados,Parados),names_to = "Estado",values_to = "N_Personas")
+  
+datos_composicion_2024 %>%
+  ggplot(aes(x = Edad, y = N_Personas, fill = Estado)) +
+  geom_col(position = "fill") +
+  labs(
+    title = "Composición del mercado laboral por grupo de edad en 2024",
+    x = "Grupo de edad",
+    y = "Proporción",
+    fill = "Estado"
+  ) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  facet_wrap(~Sexo)
+
+
+head(mtcars)
+```
+
+
+```{r}
+
+datos_composicion<- datos  %>% 
+  select(Periodo,Edad,Sexo,Activos,Ocupados,Parados,Inactivos) %>% 
+  pivot_longer(cols = c(Inactivos,Ocupados,Parados),names_to = "Estado",values_to = "N_Personas")
+
+años<- unique(datos_composicion$Periodo)
+
+graficos_composicion_por_año <- lapply(años, function(año) {
+  datos_composicion %>%
+    filter(Periodo == año) %>%
+    ggplot(aes(x =factor(Edad, levels = unique(Edad)), y = N_Personas, fill = Estado)) +
+    geom_col(position = "fill") +
+    labs(
+      title = paste("Composición del mercado laboral por grupo de edad -", año),
+      x = "Grupo de edad",
+      y = "Proporción",
+      fill = "Estado"
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+    facet_wrap(~Sexo)#Añadir o quitar según queramos comparar hombres y mujeres o no 
+})
+
+graficos_composicion_por_año
+```
+
+La siguiente gráfica muestra del total de parados por sexo que proporcion de esos parados se encuentran en cada grupo de edad
+```{r}
+graficos_parados_proporcion_por_año<- lapply(años, function(año){
+datos %>%
+  filter(Periodo==año) %>% 
+  group_by(Sexo, Periodo) %>%
+  mutate(Proporción_parados_en_sexo = Parados / sum(Parados)) %>%
+  ungroup() %>%
+  ggplot(aes(x = factor(Edad, levels = unique(Edad)), y = Proporción_parados_en_sexo, fill = Sexo)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = paste("Distribución del paro dentro de cada sexo (intragénero) -",año),
+    x = "Grupo de edad",
+    y = "Proporción del total de parados del mismo sexo",
+    fill = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  
+})
+
+graficos_parados_proporcion_por_año
+
+```
 
 
 
