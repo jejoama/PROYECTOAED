@@ -156,6 +156,7 @@ brecha_relativa <- df_clean %>%
   mutate(Razon = Hombres / Mujeres)
 
 brecha_relativa
+#f
 
 ```
 
