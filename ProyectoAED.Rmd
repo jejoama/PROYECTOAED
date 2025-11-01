@@ -71,6 +71,11 @@ df<-read_delim(archivo, delim = "\t", escape_double = FALSE, na = "..",
                trim_ws = TRUE,locale = locale(decimal_mark = ","))
 ```
 
+```{r}
+head(df)
+```
+
+
 Se comprueba la estructura inicial de los datos
 
 ```{r}
