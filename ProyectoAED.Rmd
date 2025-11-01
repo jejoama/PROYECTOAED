@@ -242,21 +242,16 @@ write_csv(df_clean,file = "data/df_clean.csv")
 
 
 ```{r}
-ggplot(df_clean, aes(x = year, y = Tasa_actividad, fill = Sexo)) +
+ggplot(df_clean, aes(x = Sexo, y = Tasa_actividad, fill = Sexo)) +
   geom_boxplot() +
   labs(
     title = "Distribución de la Tasa de Actividad por Sexo (Análisis Global)",
     subtitle = "El boxplot visualiza la mediana, la dispersión y la asimetría de la brecha.",
     y = "Tasa de Actividad (%)",
     x = NULL
-  ) +
-  # Añadir un punto para la media para complementar la mediana del boxplot
-  stat_summary(fun = mean, geom = "point", shape = 23, size = 3, fill = "darkgreen", color = "black") +
+  )  +
   theme_minimal()
 ```
-
-
-
 
 
 ```{r}
