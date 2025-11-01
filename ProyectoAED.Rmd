@@ -136,9 +136,9 @@ $$\text{Tasa de ocupación}=\frac{\text{Ocupados}}{\text{Total}} \cdot 100$$
 
 - **Renombrar columnas**: Utilizando `rename()` para acortar `"Relación con la actividad económica"` por ` "Situacion_Laboral"` para simplificar el manejo de columnas.
 
-- **Filtrado de doble conteo**: Se eliminan las instancias donde las variables representan la suma de otras instancias (`Sexo="Ambos sexos"` y `Edad="Total"`)
+- **Filtrado de doble conteo**: Se eliminan las instancias donde las variables representan la suma de otras instancias (`Sexo="Ambos sexos"` y `Edad="Total"`) para evitar doble conteo y así verificar que cada registro sea una observación única.
 
-- **Se aplica `pivot_wider()`** utilizando los valores de la columna `Situacion_Laboral` para crear las nuevas columnas (`names_from`) y los valores numéricos de la columna `Total`. De esta forma se cumple la regla tidy de una variable por columna.
+- **Se aplica `pivot_wider()`** utilizando los valores de la columna `Situacion_Laboral` para crear las nuevas columnas (`names_from`) y los valores numéricos de la columna `Total`.
 
 - **Renombrar variables**: Se renombra la columna `"parados que buscan primer empleo"` a un formato más corto `r "Parados_sin_exp"`
 
