@@ -135,6 +135,47 @@ ggplot(df_ocup_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Distribución de ocupados e inactivos por sexo", x = "Sexo", y = "Personas")
 ```
+#gif ocupados-inactivos
+```{r}
+library(ggplot2)
+library(gganimate)
+library(gifski)
+library(dplyr)
+library(tidyr)
+
+# datos por año
+df_ocup_inact <- df_clean %>%
+  group_by(Periodo, Sexo) %>%
+  summarise(
+    Ocupados = sum(Ocupados, na.rm = TRUE),
+    Inactivos = sum(Inactivos, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_longer(cols = c(Ocupados, Inactivos), names_to = "Situacion", values_to = "Personas")
+
+# gráfico animado
+graph1 <- ggplot(df_ocup_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Distribución de ocupados e inactivos por sexo – Año: {frame_time}",
+    x = "Sexo",
+    y = "Personas",
+    fill = "Situación"
+  ) +
+  theme_minimal() +
+  transition_time(Periodo) +
+  ease_aes('linear')
+
+#  GIF 
+anim_save("ocupados_inactivos_sexo.gif", animation = graph1, renderer = gifski_renderer())
+
+```
+
+
+
+
+
+
 
 ```{r}
 df_act_inact <- df_clean %>%
