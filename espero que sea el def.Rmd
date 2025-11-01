@@ -156,13 +156,17 @@ ggplot(df_act_inact, aes(x = Sexo, y = Personas, fill = Situacion)) +
   theme_minimal()
 
 ``` 
-# hola
-```{r}
-library(gganimate)
-library(ggplot2)
-library(gifski)
 
-df_anim <- df_clean %>%
+
+```{r}
+library(ggplot2)
+library(gganimate)
+library(gifski)
+library(dplyr)
+library(tidyr)
+
+# 1️⃣ Preparar los datos por año
+df_act_inact <- df_clean %>%
   group_by(Periodo, Sexo) %>%
   summarise(
     Activos = sum(Activos, na.rm = TRUE),
@@ -171,50 +175,37 @@ df_anim <- df_clean %>%
   ) %>%
   pivot_longer(cols = c(Activos, Inactivos), names_to = "Situacion", values_to = "Personas")
 
-gif <- ggplot(df_anim, aes(x = Sexo, y = Personas, fill = Situacion)) +
+# 2️⃣ Crear el gráfico animado
+graph1 <- ggplot(df_act_inact, 
+                 aes(x = Sexo, y = Personas, fill = Situacion)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Distribución de activos e inactivos por sexo – Año: {closest_state}",
-       x = "Sexo", y = "Personas", fill = "Situación") +
-  scale_fill_manual(values = c("Activos" = "red", "Inactivos" = "blue")) +
-  theme_minimal() +
-  transition_states(Periodo, transition_length = 2, state_length = 1) +
-  ease_aes('linear')
-
-animate(gif, renderer = gifski_renderer())
-
-
-```
-
-```{r}
-library(ggplot2)
-library(gganimate)
-library(gifski)
-library(dplyr)
-
-
-animacion_actividad <- df_clean %>%
-  ggplot(aes(x = Edad, y = Tasa_actividad, color = Sexo, group = interaction(Sexo, Edad))) +
-  geom_point(size = 4, alpha = 0.8) +
-  geom_line(alpha = 0.5) +
   labs(
-    title = "Tasa de Actividad por Edad y Sexo - Año: {as.integer(frame_time)}",
-    subtitle = "La brecha de género en la participación laboral.",
-    y = "Tasa de Actividad (%)",
-    x = "Edad (años)"
+    title = "Distribución de activos e inactivos por sexo – Año: {frame_time}",
+    x = "Sexo",
+    y = "Personas",
+    fill = "Situación"
   ) +
   theme_minimal() +
   transition_time(Periodo) +
   ease_aes('linear')
 
-# Guardar la animación como GIF
-anim_save(
-  filename = "evolucion_actividad.gif",
-  animation = animacion_actividad,
-  renderer = gifski_renderer(loop = TRUE)
-)
+# 3️⃣ Crear la animación desde el gráfico
+animacion <- animate(graph1, nframes = 100, fps = 10, renderer = gifski_renderer())
+
+# 4️⃣ Guardar el GIF
+anim_save("activos_inactivos_sexo.gif", animation = animacion)
+
 
 
 ```
+
+
+
+
+
+
+
+
 
 
 
