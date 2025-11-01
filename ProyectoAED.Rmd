@@ -50,6 +50,7 @@ library(forcats)
 # Visualización
 library(ggplot2)
 library(visdat)
+library(treemapify)
 library(gganimate)
 library(gifski)
 ```
@@ -94,10 +95,16 @@ sapply(df,function(x) sum(is.na(x)))
 Todos los valores ausentes se encuentran en `Total`
 
 ```{r}
-head(df[which(is.na(df$Total)),])
+df %>% rename(Situacion_Laboral = "Relación con la actividad económica") %>% filter(is.na(Total)) %>% ggplot(aes(x=Situacion_Laboral))+geom_bar(aes(fill=Edad))+labs(
+    title = "Frecuencia de los registros faltantes NA",
+    subtitle = "Distribución por Situación Laboral y la edad",
+    y = "Valores faltantes", # Quitamos la etiqueta redundante del eje Y
+    x = "Número de Registros con NA"
+  ) +
+  theme_minimal()
 ```
 
-Se observa que los valores faltantes vienen asociados a grupos de edad altos, para cualquier Sexo y cuya relación con la actividad económica es "Parados que buscan primer empleo" o "Parados"
+Se observa que los valores faltantes vienen asociados a grupos de edad altos y cuya relación con la actividad económica es "Parados que buscan primer empleo" o "Parados".
 
 
 # Definición de variables
