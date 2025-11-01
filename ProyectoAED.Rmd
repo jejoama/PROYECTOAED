@@ -49,6 +49,7 @@ library(forcats)
 
 # Visualización
 library(ggplot2)
+library(visdat)
 library(gganimate)
 library(gifski)
 ```
@@ -78,6 +79,14 @@ str(df)
 ## Valores faltantes
 
 Con el objetivo de ver la cantidad de los datos faltantes la variable que tiene estos datos se utiliza la siguiente función: 
+
+```{r}
+vis_miss(df %>% rename(Situacion_Laboral = "Relación con la actividad económica"))+theme(
+    axis.text.x = element_text(hjust = 1.2), 
+    plot.margin = unit(c(1, 1, 1, 1), "cm") 
+  )
+```
+
 ```{r}
 sapply(df,function(x) sum(is.na(x)))
 ```
