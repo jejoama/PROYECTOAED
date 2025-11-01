@@ -193,7 +193,8 @@ graph1 <- ggplot(df_act_inact,
 animacion <- animate(graph1, nframes = 100, fps = 10, renderer = gifski_renderer())
 
 # 4️⃣ Guardar el GIF
-anim_save("activos_inactivos_sexo.gif", animation = animacion)
+anim_save("activos_inactivos_sexo.gif", animation = animacion, renderer = gifski_renderer())
+
 
 
 
@@ -348,18 +349,6 @@ los jóvenes (16–24 años) y mayores (65+) presentan menor participación feme
 
 
 
-
-
-test 
-```{r}
-df_largo <- df_clean %>%
-  pivot_longer(cols = c(Ocupados, Parados, Inactivos), names_to = "Situacion", values_to = "Personas")
-
-tabla <- table(df_largo$Sexo, df_largo$Situacion)
-chisq.test(tabla)
-
-
-```
 
 
 
