@@ -102,7 +102,7 @@ ggplot(brecha_edades, aes(x = Periodo, y = brecha_paro,colour = Edad)) +
   geom_line( size = 0.5) +
   geom_point()  +
   labs(title = "Evolución de la brecha de paro (Mujeres - Hombres)",x = "Año",y = "Brecha") +
-  theme_dark()
+  theme_minimal()
 ```
 ## Gráfica de Barras comparación grupos de edades con mayor brecha en 2006 y en 2024
 
@@ -130,6 +130,8 @@ ggplot(a2, aes(x = factor(Edad, levels = unique(Edad)), y = brecha_paro)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45,hjust = 1) )
 
+años<- unique(datos$Periodo)
+
 
 grafico_brecha_paro_por_año<-lapply(años, function(año){
   brecha_edades %>% 
@@ -146,6 +148,7 @@ grafico_brecha_paro_por_año<-lapply(años, function(año){
 grafico_brecha_paro_por_año
 
 ```
+
 ```{r}
 library(tidyr)
 library(dplyr)
@@ -246,23 +249,25 @@ graficos_parados_proporcion_por_año<- lapply(años, function(año){
 datos %>%
   filter(Periodo==año) %>% 
   group_by(Sexo, Periodo) %>%
-  mutate(Proporción_parados_en_sexo = Parados / sum(Parados)) %>%
+  mutate(Proporcion_parados_en_sexo = Parados / sum(Parados)) %>%
   ungroup() %>%
-  ggplot(aes(x = factor(Edad, levels = unique(Edad)), y = Proporción_parados_en_sexo, fill = Sexo)) +
+  ggplot(aes(x = factor(Edad, levels = unique(Edad)), y = Proporcion_parados_en_sexo, fill = Sexo)) +
   geom_col(position = "dodge") +
   labs(
-    title = paste("Distribución del paro dentro de cada sexo (intragénero) -",año),
+    title = paste("Distribución del paro dentro de cada sexo -",año),
     x = "Grupo de edad",
     y = "Proporción del total de parados del mismo sexo",
     fill = "Sexo"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 })
 
 graficos_parados_proporcion_por_año
-#que tal ??
+
 ```
+
+
 
 
 
