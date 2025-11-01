@@ -252,6 +252,31 @@ anim_save("activos_inactivos_sexo.gif", animation = animacion, renderer = gifski
 
 
 Estadisiticas
+
+# desv est y varianza
+```{r}
+df_clean %>% group_by(Sexo) %>% summarise(sd_ocupados = sd(Ocupados, na.rm = TRUE),var_ocupados = var(Ocupados, na.rm = TRUE))
+
+```
+
+
+
+
+```{r}
+df_clean %>%
+  group_by(Sexo) %>%
+  summarise(media_ocupados = mean(Ocupados, na.rm = TRUE),
+            media_inactivos = mean(Inactivos, na.rm = TRUE)) %>%
+  summarise(brecha_ocup = diff(media_ocupados),
+            brecha_inact = diff(media_inactivos))
+
+```
+
+
+
+
+
+
 ```{r}
 df_brecha_genero <- df_clean %>% group_by(Periodo, Sexo) %>% summarise(tasa = mean(Tasa_actividad, na.rm = TRUE), .groups = "drop") %>% pivot_wider(names_from = Sexo, values_from = tasa) %>% mutate(Brecha = Hombres - Mujeres)
 
