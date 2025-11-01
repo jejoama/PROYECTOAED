@@ -239,6 +239,7 @@ graficos_composicion_por_año <- lapply(años, function(año) {
     theme(axis.text.x = element_text(angle = 45, hjust = 1))+
     facet_wrap(~Sexo)#Añadir o quitar según queramos comparar hombres y mujeres o no 
 })
+#Hola
 
 graficos_composicion_por_año
 ```
